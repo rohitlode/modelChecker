@@ -98,9 +98,10 @@ public class KripkeStructure {
                     
                     String fromStateName = parsedFromToStates.get(0);
                     String toStateName = parsedFromToStates.get(1);
+                    System.out.println("From State :"+fromStateName+" To State :"+toStateName);
                     State fromState = FindStateByName(fromStateName.trim());
                     State toState = FindStateByName(toStateName.trim());
-                    
+                    System.out.println("From State :"+fromState+" To State :"+toState);
                     if (fromState == null || toState == null)
                         throw new Exception(String.format("Invalid state is detected in transition %s", transitionName));
                     
@@ -173,6 +174,7 @@ public class KripkeStructure {
 		// TODO Auto-generated method stub
 		for (State state : States)
         {
+			System.out.println("StateName :"+state.StateName+":"+stName);
             if (state.StateName.equals(stName.trim()))
                 {
 //            		System.out.println("Found");

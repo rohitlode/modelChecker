@@ -18,8 +18,14 @@ public class State {
 		this.StateName = stateName;
 	}
 	
-	public boolean Equals(State other) {
-		return this.StateName.equals(other.StateName);
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (o == null || getClass() != o.getClass()) return false;
+	    State that = (State) o;
+	    return StateName.equals(that.StateName);
 	}
+
 
 }

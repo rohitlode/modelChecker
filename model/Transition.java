@@ -28,13 +28,32 @@ public class Transition {
          ToState = toState;
      }
 	 
-	 public boolean Equals(Transition other)
+	 
+	 public State getFromState() {
+		 return this.FromState;
+	 }
+	 
+	 public State getToState() {
+		 return this.ToState;
+	 }
+	 
+	 public boolean equals(Transition other)
      {
-         if (this.FromState.Equals(other.FromState) && this.ToState.Equals(other.ToState))
+         if (this.FromState.equals(other.FromState) && this.ToState.equals(other.ToState))
              return true;
 
          return false;
      }
+	 
+	 
+	 @Override
+	 public boolean equals(Object o) {
+	     if (this == o) return true;
+	     if (o == null || getClass() != o.getClass()) return false;
+	     Transition that = (Transition) o;
+	     return FromState.equals(that.FromState) &&
+	       ToState.equals(that.ToState);
+	 }
 
 
 }

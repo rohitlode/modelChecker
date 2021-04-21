@@ -89,9 +89,17 @@ private static KripkeStructure _kripke;
 		}	
 	}
 	
+	private void ResetResult() {
+		resultArea.setText("");
+		ctlFormula.setText("");
+	}
+	
+	
+	
 	class MenuActionListener implements ActionListener {
 		  public void actionPerformed(ActionEvent e) {
 			ResetModel();
+			ResetResult();
 		    JFileChooser chooser = new JFileChooser();
             chooser.setCurrentDirectory(new java.io.File("."));
             chooser.setFileFilter(new FileNameExtensionFilter("TEXT FILES", "txt", "text"));
@@ -185,8 +193,19 @@ private static KripkeStructure _kripke;
 		  }
 	}
 	
+	public class x {
+		public String m;
+		x(String m){
+			this.m = m;
+		}
+		
+	}
+	
 	public modelCheckerGUI() {
 		// TODO Auto-generated constructor stub
+		x v =new x("Hey");
+		
+		System.out.println(v.equals("hey"));
 		jf = new JFrame();
 		jf.setTitle("CTL Model Checker");
         jf.setSize(new Dimension(500,500));

@@ -72,6 +72,11 @@ public class ctlFormula {
 	public boolean IsSatisfy() throws Exception
     {
         List<State> states = SAT(_expression);
+        System.out.println("ISSATISFY STATES");
+        for(State st: states) {
+        	System.out.print(st.StateName+" ");
+        }
+        System.out.println();
         for (State st: states) {
         	System.out.print(st.StateName+" ");
         	if(st.StateName.equals(_state.StateName))
@@ -115,8 +120,9 @@ public class ctlFormula {
                 break;
             case Not:
                 //S − SAT (φ1)
-//            	System.out.println("States "+type_kripke.States);
+            	System.out.println("States "+_kripke.States.toString());
                 states.addAll(_kripke.States);
+                System.out.println("Left Exprssion "+this.leftExpression);
                 List<State> f1States = SAT(this.leftExpression);
 
                 for (State state : f1States)
@@ -166,7 +172,7 @@ public class ctlFormula {
                 {
                     for (Transition transition : _kripke.Transitions)
                     {
-                        if (sourceState.Equals(transition.FromState))
+                        if (sourceState.equals(transition.FromState))
                         {
                             tempStates.add(sourceState);
                             break;
@@ -200,7 +206,7 @@ public class ctlFormula {
             case EU:
                 //SATEU(φ1, φ2)
                 //TODO: reevaluate euFormula
-                states = SAT_EU();
+                states = SAT_EU(this.leftExpression, this.rightExpression);
                 break;
             case EF:
                 //SAT (E( U φ1))
@@ -233,13 +239,17 @@ public class ctlFormula {
         return states;
     }
 	
+	
+	
 	private String mySubString(String myString, int start, int length) {
 	    return myString.substring(start, Math.min(start + length, myString.length()));
 	}
 	
+	
+	
 	private TypeSAT GetTypeSAT(String expression)
     {
-		System.out.println("GET TYPE SAT");
+		System.out.println("GET TYPE SAT "+expression);
         //remove extra brackets
         expression = RemoveExtraBrackets(expression);
 
@@ -310,7 +320,7 @@ public class ctlFormula {
         }
         if (expression.startsWith("EF"))
         {
-            this.leftExpression = mySubString(expression,2, expression.length());
+            this.leftExpression = mySubString(expression,2, expression.length() - 2);
             return TypeSAT.EF;
         }
         if (expression.startsWith("EG"))
@@ -326,7 +336,7 @@ public class ctlFormula {
         if (expression.startsWith("AG"))
         {
         	this.leftExpression = mySubString(expression, 2, expression.length()-2);
-        	  System.out.println("Conv exp "+expression.substring(2, expression.length()));
+        	  System.out.println("Converted AG exp "+ this.leftExpression);
             return TypeSAT.AG;
         }
 
@@ -335,15 +345,16 @@ public class ctlFormula {
 
 	
 
-	private List<State> SAT_EU() throws Exception {
+	//SAT EU
+	private List<State> SAT_EU(String leftExpString, String rightExpString) throws Exception {
 		// TODO Auto-generated method stub
 		List<State> w = new ArrayList<State>();
         List<State> x = new ArrayList<State>();
         List<State> y = new ArrayList<State>();
 
-        w = SAT(this.leftExpression);
+        w = SAT(leftExpString);
         x.addAll(_kripke.States);
-        y = SAT(this.rightExpression);
+        y = SAT(rightExpString);
 
         while (!AreListStatesEqual(x, y))
         {
@@ -370,6 +381,8 @@ public class ctlFormula {
         return y;
 	}
 
+	
+	
 	private List<State> PreE(List<State> y) {
         //{s ∈ S | exists s, (s → s and s ∈ Y )}
         List<State> states = new ArrayList<State>();
@@ -380,7 +393,12 @@ public class ctlFormula {
             for (State destState : y)
             {
                 Transition myTransition = new Transition(sourceState, destState);
-                if (_kripke.Transitions.contains(myTransition))
+                System.out.println("PRE E :"+" ["+myTransition.getFromState().StateName+","+myTransition.getToState().StateName+"] "+_kripke.Transitions.stream().anyMatch(o -> 
+                		o.equals(myTransition)));
+                if(_kripke.Transitions.stream().anyMatch(o -> 
+                		o.equals(myTransition)
+                		))
+//                if (_kripke.Transitions.contains(myTransition))
                 {
                     if (!states.contains(sourceState))
                         states.add(sourceState);
@@ -391,6 +409,7 @@ public class ctlFormula {
         return states;
 	}
 
+	
 	private boolean AreListStatesEqual(List<State> list1, List<State> list2) {
 		// TODO Auto-generated method stub
 		if (list1.size() != list2.size())
@@ -405,6 +424,8 @@ public class ctlFormula {
         return true;
 	}
 
+	
+	//SAT_AF
 	private List<State> SAT_AF(String afFormula) throws Exception {
 		// TODO Auto-generated method stub
 		List<State> x = new ArrayList<State>();
@@ -457,13 +478,22 @@ public class ctlFormula {
          return PreEY;
 	}
 
-	private List<State> SAT_EX(String exFormula) {
+	
+	//SAT EX
+	private List<State> SAT_EX(String exFormula) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		 //X := SAT (φ);
+        //Y := pre∃(X);
+        //return Y
+        List<State> x = new ArrayList<State>();
+        List<State> y = new ArrayList<State>();
+        x = SAT(exFormula);
+        y = PreE(x);
+        return y;
 	}
 	
 	
-
+	//isBINARYOP
 	private boolean IsBinaryOp(String expression, String symbol) {
 		// TODO Auto-generated method stub
 		boolean isBinaryOp = false;
@@ -495,6 +525,8 @@ public class ctlFormula {
         return isBinaryOp;
 	}
 
+	
+	
 	private boolean IsAtomic(String expression) {
 		// TODO Auto-generated method stub
 		if (_kripke.Atoms.contains(expression))
